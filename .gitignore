@@ -12,6 +12,15 @@ target/
 *.iws
 *.iml
 *.ipr
+# Ignore everything
+*
+
+# Except src folder
+!src/
+!src/**
+
+# Keep gitignore itself
+!.gitignore
 
 ### Eclipse ###
 .apt_generated

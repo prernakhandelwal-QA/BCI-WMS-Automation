@@ -10,21 +10,21 @@ public class LoginPage {
     private Page page;
 
     // -------- Locators --------
-    private Locator usernameInput;
-    private Locator passwordInput;
-    private Locator loginButton;
+    public Locator usernameInput;
+    public Locator passwordInput;
+    public Locator loginButton;
 
-    private Locator profileIcon;
-    private Locator resetPasswordLink;
-    private Locator logoutLink;
+    public Locator profileIcon;
+    public Locator resetPasswordLink;
+    public Locator logoutLink;
 
-    private Locator newPasswordInput;
-    private Locator confirmPasswordInput;
-    private Locator submitButton;
+    public Locator newPasswordInput;
+    public Locator confirmPasswordInput;
+    public Locator submitButton;
 
-    private Locator errorPopup;
-    private Locator closePopupButton;
-    private Locator dashboardText;
+    public Locator errorPopup;
+    public Locator closePopupButton;
+    public Locator dashboardText;
 
     // -------- Constructor --------
     public LoginPage(Page page) {
@@ -36,7 +36,7 @@ public class LoginPage {
         loginButton = page.locator("button[type='submit']");
 
         // Profile / popup locators
-        profileIcon = page.locator("//a/img[@class='profile_image']");
+        profileIcon = page.locator("//a/i[text()='person']");
         resetPasswordLink = page.getByText("Reset Password");
         logoutLink = page.getByText("Logout");
 
@@ -73,11 +73,13 @@ public class LoginPage {
 
     public void enterUsername(String username) {
         assertThat(usernameInput).isVisible();
+        usernameInput.click();
         usernameInput.fill(username);
     }
 
     public void enterPassword(String password) {
         assertThat(passwordInput).isVisible();
+        passwordInput.click();
         passwordInput.fill(password);
     }
 
@@ -90,9 +92,12 @@ public class LoginPage {
     }
 
     // -------- Validation --------
-    public void verifyDashboardVisible() {
-        assertThat(dashboardText).isVisible();
+
+    public void verifyDashboardPageVisible() {
+        assertThat(page)
+                .hasURL("http://180.151.246.51:1037/app/dashboard");
     }
+
 
     public void verifyHomePageUrl() {
         assertThat(page).hasURL("**/app/home");

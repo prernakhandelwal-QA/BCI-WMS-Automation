@@ -1,27 +1,23 @@
 package tests.login;
 
 import base.BaseTest;
+import models.User;
 import org.testng.annotations.*;
-import com.microsoft.playwright.assertions.PlaywrightAssertions;
 import pages.login.LoginPage;
 import utils.ConfigReader;
 import utils.ExcelReader;
 import utils.UserHelper;
 
-import java.util.Map;
-
 @Listeners(utils.TestListener.class)
 
-public class LoginTest extends BaseTest {
+public class LoginTest extends BaseTest  {
 
     private LoginPage loginPage;
     private String baseUrl;
 
     @BeforeMethod
     public void setUpTest() {
-        setup();
         loginPage = new LoginPage(page);
-
         // ✅ Read from config properly
         baseUrl = ConfigReader.get("base.url");
     }
@@ -33,40 +29,36 @@ public class LoginTest extends BaseTest {
         loginPage.login(username, password);
 
         if (expectedResult.equalsIgnoreCase("success")) {
-            PlaywrightAssertions.assertThat(page).hasURL("**/app/dashboard");
-            loginPage.verifyDashboardVisible();
+            //Validate successful login
+            loginPage.verifyDashboardPageVisible();
+            System.out.println("Login Successful for existing user");
         } else {
             loginPage.verifyErrorPopupVisible();
             loginPage.closeErrorPopup();
         }
     }
 
-    // ✅ NEW test using your "created_user" equivalent
+    // ✅ Check login with the new user
     @Test
     public void testLoginWithCreatedUser() {
 
-        // ✅ Create user dynamically (your conftest logic)
-        Map<String, String> user = UserHelper.createUser(page, baseUrl);
+        // ✅ Create user
+        User user = UserHelper.createUser(page, baseUrl);
 
-        String email = user.get("email");
-        String password = user.get("password");
+        String Usercode = user.getUserCode();
+        String password = user.getPassword();
 
         loginPage.navigate(baseUrl);
-        loginPage.login(email, password);
+        loginPage.login(Usercode, password);
 
-        PlaywrightAssertions.assertThat(page).hasURL("**/app/dashboard");
-        loginPage.verifyDashboardVisible();
+        //Validate successful login
+        loginPage.verifyDashboardPageVisible();
+        System.out.println("Login Successful for new user");
+
     }
-
-
+    //getting multiple combination of credentials from the excel
     @DataProvider(name = "loginData")
     public Object[][] getLoginData() {
         return ExcelReader.getLoginData("login_data.xlsx", "Sheet1");
-    }
-
-
-    @AfterMethod
-    public void tearDownTest() {
-        tearDown();
     }
 }

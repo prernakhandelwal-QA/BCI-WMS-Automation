@@ -1,53 +1,77 @@
 package utils;
-
-import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Locator;
+import models.User;
 import pages.login.LoginPage;
-
-import java.util.HashMap;
-import java.util.Map;
+import pages.usermanagement.UserManagementPage;
+import com.microsoft.playwright.Page;
 
 public class UserHelper {
 
-    public static Map<String, String> createUser(Page page, String baseUrl) {
+    public static User createUser(Page page, String baseUrl) {
 
         LoginPage loginPage = new LoginPage(page);
-//        UserManagementPage userPage = new UserManagementPage(page);
-//
-//        long uniqueId = System.currentTimeMillis();
-//
-//        Map<String, String> userData = new HashMap<>();
-//
-//        userData.put("first_name", "Auto");
-//        userData.put("last_name", "User");
-//        userData.put("phone_number", "9876543210");
-//        userData.put("user_code", "AUTO" + uniqueId);
-//        userData.put("email", "auto" + uniqueId + "@test.com");
-//        userData.put("password", "Bcil@" + uniqueId);
+        UserManagementPage userManagementPage = new UserManagementPage(page);
 
+        long uniqueId = System.currentTimeMillis();
+
+        String firstName = "Auto";
+        String lastName = "User";
+        String phoneNumber = "9876543210";
+        String userCode = "AUTO" + uniqueId;
+        String email = "auto" + uniqueId + "@test.com";
+        String password = "Bcil@" + uniqueId;
+
+        // ✅ Login
         loginPage.navigate(baseUrl);
         loginPage.login("B1350", "Bcil@12345678");
 
-//        userPage.openUserRoleAssignment();
-//        userPage.clickAddUser();
-//
-//        userPage.fillUserForm(
-//                userData.get("first_name"),
-//                userData.get("last_name"),
-//                userData.get("phone_number"),
-//                userData.get("user_code"),
-//                userData.get("email"),
-//                userData.get("password"),
-//                userData.get("password")
-//        );
-//
-//        userPage.selectUserType("Supervisor");
-//        userPage.selectReportingManager("TCF - ADMIN");
-//        userPage.selectRole();
-//        userPage.clickAdd();
+        // ✅ Create user
+        userManagementPage.openUserRoleAssignment();
+        userManagementPage.clickAddUser();
 
+        userManagementPage.fillUserForm(
+                firstName,
+                lastName,
+                phoneNumber,
+                userCode,
+                email,
+                password,
+                password
+        );
+
+        userManagementPage.selectUserType("Admin");
+        userManagementPage.selectReportingManager("Prerna - Khandelwal");
+        userManagementPage.selectDesignation("Supervisor");
+        userManagementPage.selectPlant("WHRM-MDK");
+        userManagementPage.selectRole();
+        userManagementPage.clickAdd();
+
+        System.out.println("Created User:"+ userCode);
+
+        // ✅ Safe logout
         loginPage.logout();
 
-//        return userData;
-        return null;
+        return new User(firstName, lastName, phoneNumber, userCode, email, password);
+    }
+    public static void deleteUser(Page page, String baseUrl, String userCode) {
+
+          UserManagementPage userManagementPage = new UserManagementPage(page);
+  /*      LoginPage loginPage = new LoginPage(page);
+
+        // ✅ Login as admin
+        loginPage.navigate(baseUrl);
+        loginPage.login("B1350", "Bcil@12345678");*/
+
+        // ✅ Navigate to user list
+        userManagementPage.openUserRoleAssignment();
+
+        // ✅ Search / locate user row
+        Locator row = page.locator("//tr[.//td[contains(normalize-space(), '" + userCode + "')]]");
+
+        // ✅ Click delete icon (adjust selector based on your UI)
+        row.locator("i:has-text('delete')").click();
+
+        // ✅ Confirm delete (if popup exists)
+        page.locator("//button[text()='Confirm']").click();
     }
 }
